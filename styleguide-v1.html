@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design System — Agencia Rosa</title>
+
+  <!-- Google Fonts: Cormorant Garamond (display serif editorial) + DM Sans (cuerpo limpio) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN con configuración custom -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // tailwind.config — copiá este bloque a cualquier página del proyecto
+    // para tener los mismos tokens disponibles en todas partes
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            // Paleta principal extraída del moodboard de Agencia Rosa
+            primary: {
+              DEFAULT: '#d4693f', // Terracota — color más distintivo de marca
+              light:   '#e08f6f', // Versión iluminada para hovers
+              dark:    '#b0502a', // Versión oscura para pressed states
+            },
+            secondary: {
+              DEFAULT: '#d8dca6', // Verde sage suave — fondo de secciones
+              light:   '#eaeccc',
+              dark:    '#b8be7c',
+            },
+            accent: {
+              DEFAULT: '#cdb8dc', // Lavanda suave — acento femenino
+              light:   '#e2d6ed',
+              dark:    '#a88fc0',
+            },
+            gold: {
+              DEFAULT: '#c9a265', // Dorado cálido — badges especiales
+              light:   '#dfc08e',
+              dark:    '#a07e42',
+            },
+            surface: {
+              DEFAULT: '#f7f2ea', // Crema cálido — fondo principal
+              dark:    '#ede5d8', // Para separadores sutiles
+            },
+            ink: {
+              DEFAULT: '#1c1917', // Casi negro con temperatura cálida — texto principal
+              muted:   '#6b6560', // Texto secundario / metadata
+              subtle:  '#a09890', // Placeholders, hints
+            },
+          },
+          fontFamily: {
+            // font-display → para títulos grandes, editorial
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            // font-sans → para cuerpo, UI, navegación
+            sans:    ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+          fontSize: {
+            // Escala tipográfica completa del sistema
+            'xs':  ['0.75rem',  { lineHeight: '1.4' }],
+            'sm':  ['0.875rem', { lineHeight: '1.5' }],
+            'base':['1rem',     { lineHeight: '1.6' }],
+            'lg':  ['1.125rem', { lineHeight: '1.55' }],
+            'xl':  ['1.25rem',  { lineHeight: '1.5' }],
+            '2xl': ['1.5rem',   { lineHeight: '1.4' }],
+            '3xl': ['2rem',     { lineHeight: '1.25' }],
+            '4xl': ['2.5rem',   { lineHeight: '1.15' }],
+            '5xl': ['3.5rem',   { lineHeight: '1.05' }],
+            '6xl': ['4.5rem',   { lineHeight: '1' }],
+          },
+          borderRadius: {
+            // Bordes moderados — no extremos, coherente con estética orgánica del moodboard
+            'sm':  '0.25rem',
+            DEFAULT:'0.5rem',
+            'md':  '0.625rem',
+            'lg':  '0.875rem',
+            'xl':  '1.25rem',
+            '2xl': '1.75rem',
+            'full':'9999px',
+          },
+          spacing: {
+            // Espaciado generoso — el moodboard respira mucho
+            '18': '4.5rem',
+            '22': '5.5rem',
+            '28': '7rem',
+            '36': '9rem',
+          },
+          boxShadow: {
+            // Sombras muy sutiles — el sistema casi no usa sombras fuertes
+            'soft': '0 2px 12px 0 rgba(28,25,23,0.07)',
+            'card': '0 4px 24px 0 rgba(28,25,23,0.09)',
+            'none': 'none',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Variables CSS — sincronizadas con tailwind.config para uso directo en CSS */
+    :root {
+      --color-primary:        #d4693f;
+      --color-primary-light:  #e08f6f;
+      --color-primary-dark:   #b0502a;
+      --color-secondary:      #d8dca6;
+      --color-accent:         #cdb8dc;
+      --color-gold:           #c9a265;
+      --color-surface:        #f7f2ea;
+      --color-surface-dark:   #ede5d8;
+      --color-ink:            #1c1917;
+      --color-ink-muted:      #6b6560;
+      --color-ink-subtle:     #a09890;
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-sans:    'DM Sans', system-ui, sans-serif;
+    }
+
+    /* Estilos base — el styleguide se autoestiliza con su propio sistema */
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-surface);
+      color: var(--color-ink);
+    }
+
+    /* Transición suave para todos los elementos interactivos */
+    button, input, textarea, select, a {
+      transition: all 0.2s ease;
+    }
+
+    /* Sidebar scroll suave */
+    .sidebar-nav a {
+      transition: color 0.15s ease, padding-left 0.15s ease;
+    }
+    .sidebar-nav a:hover {
+      color: var(--color-primary);
+      padding-left: 0.375rem;
+    }
+
+    /* Anclas con offset para el header fijo */
+    [id] {
+      scroll-margin-top: 5rem;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- ==================== HEADER ==================== -->
+  <!-- sticky top-0 con z alto para que quede sobre el contenido al hacer scroll -->
+  <header class="sticky top-0 z-50 bg-surface border-b border-surface-dark">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div>
+        <!-- font-display → Cormorant Garamond, serif editorial para el nombre de marca -->
+        <h1 class="font-display text-2xl font-light text-ink tracking-wide">Agencia Rosa</h1>
+        <p class="font-sans text-xs text-ink-muted tracking-widest uppercase mt-0.5">Design System</p>
+      </div>
+      <!-- Botón mobile para toggle del sidebar -->
+      <button
+        id="sidebar-toggle"
+        class="lg:hidden flex items-center gap-2 text-sm text-ink-muted border border-surface-dark rounded px-3 py-1.5 hover:border-primary hover:text-primary"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        Navegación
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== LAYOUT ==================== -->
+  <div class="max-w-7xl mx-auto px-6 py-12 flex gap-12">
+
+    <!-- SIDEBAR — sticky para navegar entre secciones -->
+    <!-- hidden en mobile, visible en lg. Se togglea con JS -->
+    <aside
+      id="sidebar"
+      class="hidden lg:block w-52 shrink-0"
+    >
+      <!-- sticky para que siga el scroll pero no se vaya de pantalla -->
+      <nav class="sticky top-24 sidebar-nav">
+        <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Índice</p>
+        <ul class="space-y-1 text-sm text-ink-muted font-sans font-light">
+          <li><a href="#colores" class="block py-1">Colores</a></li>
+          <li><a href="#tipografia" class="block py-1">Tipografía</a></li>
+          <li><a href="#espaciado" class="block py-1">Espaciado</a></li>
+          <li><a href="#botones" class="block py-1">Botones</a></li>
+          <li><a href="#inputs" class="block py-1">Inputs</a></li>
+          <li><a href="#cards" class="block py-1">Cards</a></li>
+          <li><a href="#badges" class="block py-1">Badges</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 min-w-0 space-y-20">
+
+      <!-- ==================== COLORES ==================== -->
+      <section id="colores">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Colores</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Paleta extraída del moodboard. Cada color tiene variantes light y dark para estados interactivos.</p>
+
+        <!-- Grupo: Primary -->
+        <div class="mb-10">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Primary — Terracota</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- Swatch: bg-primary-light — hover states -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-24 bg-primary-light"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Primary Light</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#e08f6f</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-primary-light</p>
+              </div>
+            </div>
+            <!-- Swatch: bg-primary — color principal de marca -->
+            <div class="rounded-lg overflow-hidden shadow-card ring-2 ring-primary ring-offset-2 ring-offset-surface">
+              <div class="h-24 bg-primary"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Primary</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#d4693f</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-primary</p>
+              </div>
+            </div>
+            <!-- Swatch: bg-primary-dark — pressed/active states -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-24 bg-primary-dark"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Primary Dark</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#b0502a</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-primary-dark</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupo: Secondary -->
+        <div class="mb-10">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Secondary — Sage</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-24 bg-secondary-light"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Secondary Light</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#eaeccc</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-secondary-light</p>
+              </div>
+            </div>
+            <div class="rounded-lg overflow-hidden shadow-soft ring-2 ring-secondary-dark ring-offset-2 ring-offset-surface">
+              <div class="h-24 bg-secondary"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Secondary</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#d8dca6</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-secondary</p>
+              </div>
+            </div>
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-24 bg-secondary-dark"></div>
+              <div class="bg-white px-4 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Secondary Dark</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#b8be7c</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-secondary-dark</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupo: Accent + Gold + Surfaces -->
+        <div class="mb-4">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Accent, Gold y Superficies</p>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <!-- Accent lavanda -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-20 bg-accent"></div>
+              <div class="bg-white px-3 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Accent</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#cdb8dc</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-accent</p>
+              </div>
+            </div>
+            <!-- Gold -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-20 bg-gold"></div>
+              <div class="bg-white px-3 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Gold</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#c9a265</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-gold</p>
+              </div>
+            </div>
+            <!-- Surface -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-20 bg-surface border border-surface-dark"></div>
+              <div class="bg-white px-3 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Surface</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#f7f2ea</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-surface</p>
+              </div>
+            </div>
+            <!-- Ink -->
+            <div class="rounded-lg overflow-hidden shadow-soft">
+              <div class="h-20 bg-ink"></div>
+              <div class="bg-white px-3 py-3">
+                <p class="font-sans text-sm font-medium text-ink">Ink</p>
+                <p class="font-sans text-xs text-ink-muted mt-0.5">#1c1917</p>
+                <p class="font-sans text-xs text-ink-subtle mt-0.5">bg-ink</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TIPOGRAFÍA ==================== -->
+      <section id="tipografia">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Tipografía</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Dos familias: Cormorant Garamond para títulos editoriales y DM Sans para UI y cuerpo de texto.</p>
+
+        <!-- Display: Cormorant Garamond -->
+        <div class="mb-12 p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">font-display — Cormorant Garamond</p>
+          <!-- Cada línea usa font-display con tamaño distinto para mostrar la escala -->
+          <div class="space-y-4">
+            <div class="flex items-baseline gap-6 py-3 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">6xl</span>
+              <span class="font-display text-6xl font-light text-ink">Agencia Rosa</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-3 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">5xl</span>
+              <span class="font-display text-5xl font-light text-ink">Branding editorial</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-3 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">4xl</span>
+              <span class="font-display text-4xl font-light text-ink">Diseño y desarrollo web</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-3 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">3xl</span>
+              <span class="font-display text-3xl font-light text-ink">Contenido y fotografía</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-3 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">2xl</span>
+              <span class="font-display text-2xl font-light text-ink italic">The Vision Process</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-3">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">xl</span>
+              <span class="font-display text-xl font-light text-ink">Nuestra especialidad es el branding</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sans: DM Sans -->
+        <div class="p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">font-sans — DM Sans</p>
+          <div class="space-y-3">
+            <div class="flex items-baseline gap-6 py-2.5 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">xl</span>
+              <span class="font-sans text-xl font-light text-ink">Trabajamos la marca completa</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-2.5 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">lg</span>
+              <span class="font-sans text-lg font-light text-ink">Servicios, tienda, portfolio</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-2.5 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">base</span>
+              <span class="font-sans text-base font-light text-ink">Aprendés a crear una buena dirección creativa y a construir el concepto y estrategia de una marca.</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-2.5 border-b border-surface-dark">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">sm</span>
+              <span class="font-sans text-sm text-ink-muted font-light">Términos y condiciones · Política de privacidad · Mi cuenta</span>
+            </div>
+            <div class="flex items-baseline gap-6 py-2.5">
+              <span class="font-sans text-xs text-ink-subtle w-10 shrink-0">xs</span>
+              <span class="font-sans text-xs text-ink-subtle tracking-widest uppercase font-medium">Categorías · Etiquetas · Metadata</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ESPACIADO ==================== -->
+      <section id="espaciado">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Espaciado</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">El sistema usa espaciado generoso — el moodboard respira. Escala base 4px.</p>
+
+        <div class="p-8 bg-white rounded-xl shadow-soft">
+          <!-- Cada barra representa visualmente el tamaño del espaciado -->
+          <div class="space-y-4">
+            <!-- Para cada valor: la barra crece proporcionalmente usando width variable -->
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">4</span>
+              <div class="h-5 bg-primary rounded" style="width: 1rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">4px — p-1, m-1, gap-1</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">8</span>
+              <div class="h-5 bg-primary rounded" style="width: 2rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">8px — p-2, m-2, gap-2</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">12</span>
+              <div class="h-5 bg-primary rounded" style="width: 3rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">12px — p-3, m-3, gap-3</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">16</span>
+              <div class="h-5 bg-primary rounded" style="width: 4rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">16px — p-4, m-4, gap-4</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">24</span>
+              <div class="h-5 bg-primary rounded" style="width: 6rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">24px — p-6, m-6, gap-6 — uso frecuente en padding de cards</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">32</span>
+              <div class="h-5 bg-primary rounded" style="width: 8rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">32px — p-8, m-8, gap-8 — secciones internas</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">48</span>
+              <div class="h-5 bg-primary rounded" style="width: 12rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">48px — p-12, m-12 — separación entre secciones</span>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="font-sans text-xs text-ink-subtle w-8 text-right shrink-0">80</span>
+              <div class="h-5 bg-primary rounded" style="width: 20rem;"></div>
+              <span class="font-sans text-xs text-ink-muted">80px — py-20 — secciones hero / espaciado generoso</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== BOTONES ==================== -->
+      <section id="botones">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Botones</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Cuatro variantes × tres tamaños. El primario usa terracota, el outline respeta el estilo minimalista del moodboard.</p>
+
+        <!-- Primary -->
+        <div class="mb-8 p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">Primary — bg-primary</p>
+          <div class="flex flex-wrap items-center gap-4">
+            <!-- sm: text-xs, py-1.5 px-4 -->
+            <button class="font-sans text-xs font-light tracking-wide text-white bg-primary hover:bg-primary-dark rounded px-4 py-1.5">
+              Pequeño
+            </button>
+            <!-- md: text-sm, py-2.5 px-6 → el tamaño más usado en el moodboard -->
+            <button class="font-sans text-sm font-light tracking-wide text-white bg-primary hover:bg-primary-dark rounded px-6 py-2.5">
+              Trabajemos juntos
+            </button>
+            <!-- lg: text-base, py-3.5 px-8 -->
+            <button class="font-sans text-base font-light tracking-wide text-white bg-primary hover:bg-primary-dark rounded px-8 py-3.5">
+              Me quiero inscribir
+            </button>
+          </div>
+        </div>
+
+        <!-- Secondary -->
+        <div class="mb-8 p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">Secondary — bg-secondary</p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button class="font-sans text-xs font-light tracking-wide text-ink bg-secondary hover:bg-secondary-dark rounded px-4 py-1.5">
+              Pequeño
+            </button>
+            <button class="font-sans text-sm font-light tracking-wide text-ink bg-secondary hover:bg-secondary-dark rounded px-6 py-2.5">
+              Quiero saber más
+            </button>
+            <button class="font-sans text-base font-light tracking-wide text-ink bg-secondary hover:bg-secondary-dark rounded px-8 py-3.5">
+              Ver portfolio
+            </button>
+          </div>
+        </div>
+
+        <!-- Outline — muy usado en el moodboard (ej: "Trabajemos juntos ↗", "Me quiero inscribir") -->
+        <div class="mb-8 p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">Outline — border-ink hover:border-primary</p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button class="font-sans text-xs font-light tracking-wide text-ink border border-ink hover:border-primary hover:text-primary rounded px-4 py-1.5">
+              Pequeño
+            </button>
+            <!-- Este es el estilo del botón "Trabajemos juntos ↗" del moodboard -->
+            <button class="font-sans text-sm font-light tracking-wide text-ink border border-ink hover:border-primary hover:text-primary rounded px-6 py-2.5">
+              Trabajemos juntos ↗
+            </button>
+            <button class="font-sans text-base font-light tracking-wide text-ink border border-ink hover:border-primary hover:text-primary rounded px-8 py-3.5">
+              Contacto
+            </button>
+          </div>
+        </div>
+
+        <!-- Ghost -->
+        <div class="p-8 bg-white rounded-xl shadow-soft">
+          <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-6">Ghost — sin fondo ni borde</p>
+          <div class="flex flex-wrap items-center gap-4">
+            <button class="font-sans text-xs font-light tracking-wide text-ink-muted hover:text-primary underline underline-offset-4 px-1 py-1.5">
+              Pequeño
+            </button>
+            <button class="font-sans text-sm font-light tracking-wide text-ink-muted hover:text-primary underline underline-offset-4 px-1 py-2.5">
+              Suscribite a nuestra newsletter
+            </button>
+            <button class="font-sans text-base font-light tracking-wide text-ink-muted hover:text-primary underline underline-offset-4 px-1 py-3.5">
+              Ver todos los servicios
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== INPUTS ==================== -->
+      <section id="inputs">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Inputs</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Formularios limpios y ligeros. Bordes sutiles, sin sombras pesadas.</p>
+
+        <div class="p-8 bg-white rounded-xl shadow-soft space-y-6">
+
+          <!-- Normal -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Email *</label>
+            <!-- border-surface-dark → borde muy sutil para no competir con el contenido -->
+            <input
+              type="email"
+              placeholder="tu@email.com"
+              class="w-full font-sans text-sm font-light text-ink placeholder-ink-subtle bg-surface border border-surface-dark rounded px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+            <p class="font-sans text-xs text-ink-subtle mt-1">Estado: normal</p>
+          </div>
+
+          <!-- Focus (simulado con clases aplicadas) -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Nombre</label>
+            <input
+              type="text"
+              value="Agencia Rosa"
+              class="w-full font-sans text-sm font-light text-ink bg-surface border border-primary ring-1 ring-primary rounded px-4 py-3 outline-none"
+            />
+            <p class="font-sans text-xs text-ink-subtle mt-1">Estado: focus</p>
+          </div>
+
+          <!-- Error -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Teléfono</label>
+            <input
+              type="tel"
+              value="abc123"
+              class="w-full font-sans text-sm font-light text-ink bg-surface border border-red-400 ring-1 ring-red-300 rounded px-4 py-3 outline-none"
+            />
+            <!-- Mensaje de error en rojo suave -->
+            <p class="font-sans text-xs text-red-500 mt-1">Ingresá un número de teléfono válido.</p>
+          </div>
+
+          <!-- Disabled -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Campo deshabilitado</label>
+            <input
+              type="text"
+              value="No editable"
+              disabled
+              class="w-full font-sans text-sm font-light text-ink-subtle bg-surface-dark border border-surface-dark rounded px-4 py-3 outline-none cursor-not-allowed opacity-60"
+            />
+            <p class="font-sans text-xs text-ink-subtle mt-1">Estado: disabled</p>
+          </div>
+
+          <!-- Select -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Servicio</label>
+            <select class="w-full font-sans text-sm font-light text-ink bg-surface border border-surface-dark rounded px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer">
+              <option value="">Seleccioná un servicio</option>
+              <option>Branding</option>
+              <option>Contenido y fotografía</option>
+              <option>Diseño y desarrollo web</option>
+              <option>Packaging</option>
+            </select>
+          </div>
+
+          <!-- Textarea -->
+          <div>
+            <label class="block font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Mensaje</label>
+            <textarea
+              rows="4"
+              placeholder="Contanos sobre tu proyecto..."
+              class="w-full font-sans text-sm font-light text-ink placeholder-ink-subtle bg-surface border border-surface-dark rounded px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"
+            ></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== CARDS ==================== -->
+      <section id="cards">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Cards</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Tres variantes. Sombra suave, bordes redondeados moderados — consistente con el estilo orgánico.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <!-- Card básica -->
+          <div class="bg-white rounded-xl shadow-soft p-6 flex flex-col gap-4">
+            <!-- Categoría en mayúsculas pequeñas, color muted -->
+            <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase">Servicio</p>
+            <!-- font-display para el título de la card — da el toque editorial del moodboard -->
+            <h3 class="font-display text-2xl font-light text-ink leading-snug">Branding completo</h3>
+            <p class="font-sans text-sm font-light text-ink-muted leading-relaxed">No trabajamos solo un logo bonito — trabajamos una marca completa que inspira y conecta con su audiencia.</p>
+            <button class="mt-auto font-sans text-xs font-light tracking-wide text-ink border border-ink hover:border-primary hover:text-primary rounded px-4 py-2 self-start">
+              Quiero saber más
+            </button>
+          </div>
+
+          <!-- Card con imagen placeholder -->
+          <div class="bg-white rounded-xl shadow-soft overflow-hidden flex flex-col">
+            <!-- Imagen placeholder con color secondary como fondo -->
+            <div class="h-44 bg-secondary flex items-center justify-center">
+              <span class="font-display text-3xl font-light text-secondary-dark italic">The Vision Process</span>
+            </div>
+            <div class="p-6 flex flex-col gap-3 flex-1">
+              <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase">Curso</p>
+              <h3 class="font-display text-xl font-light text-ink">Dirección creativa y estrategia de marca</h3>
+              <p class="font-sans text-sm font-light text-ink-muted">6 clases pregrabadas + 2 plantillas para tu servicio de branding.</p>
+              <button class="mt-auto font-sans text-xs font-light tracking-wide text-white bg-primary hover:bg-primary-dark rounded px-4 py-2 self-start">
+                Me quiero inscribir
+              </button>
+            </div>
+          </div>
+
+          <!-- Card con acciones y badge — estilo "Nuestra especialidad" del moodboard -->
+          <div class="bg-white rounded-xl shadow-card overflow-hidden flex flex-col relative">
+            <!-- Badge posicionado en la esquina, como en el moodboard -->
+            <div class="absolute top-4 right-4 z-10">
+              <span class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold text-white font-sans text-xs font-medium text-center leading-tight">
+                Nuestra<br/>especialidad
+              </span>
+            </div>
+            <div class="h-44 bg-surface-dark flex items-end p-5">
+              <p class="font-display text-2xl font-light text-ink italic">Packaging</p>
+            </div>
+            <div class="p-6 flex flex-col gap-3 flex-1">
+              <h3 class="font-display text-xl font-light text-ink">Identidad visual y empaque</h3>
+              <p class="font-sans text-sm font-light text-ink-muted leading-relaxed">Diseñamos el packaging que comunica la esencia de tu marca en cada detalle.</p>
+              <div class="flex gap-2 mt-auto">
+                <button class="font-sans text-xs font-light text-white bg-primary hover:bg-primary-dark rounded px-4 py-2">Ver ejemplos</button>
+                <button class="font-sans text-xs font-light text-ink border border-surface-dark hover:border-primary hover:text-primary rounded px-4 py-2">Contactar</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== BADGES ==================== -->
+      <section id="badges">
+        <h2 class="font-display text-4xl font-light text-ink mb-2">Badges</h2>
+        <p class="font-sans text-sm text-ink-muted mb-10">Etiquetas semánticas. Usar con moderación para no saturar la interfaz minimalista.</p>
+
+        <div class="p-8 bg-white rounded-xl shadow-soft space-y-8">
+
+          <!-- Badges inline -->
+          <div>
+            <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Inline — texto + fondo suave</p>
+            <div class="flex flex-wrap gap-3">
+              <!-- primary badge — terracota suave -->
+              <span class="inline-flex items-center font-sans text-xs font-medium text-primary bg-primary/10 rounded-full px-3 py-1 tracking-wide">
+                Branding
+              </span>
+              <!-- secondary badge — sage -->
+              <span class="inline-flex items-center font-sans text-xs font-medium text-secondary-dark bg-secondary/40 rounded-full px-3 py-1 tracking-wide">
+                Contenido
+              </span>
+              <!-- accent badge — lavanda -->
+              <span class="inline-flex items-center font-sans text-xs font-medium text-accent-dark bg-accent/30 rounded-full px-3 py-1 tracking-wide">
+                Diseño web
+              </span>
+              <!-- gold badge — el más especial, para destacar -->
+              <span class="inline-flex items-center font-sans text-xs font-medium text-gold-dark bg-gold/20 rounded-full px-3 py-1 tracking-wide">
+                Nuestra especialidad
+              </span>
+              <!-- neutral badge -->
+              <span class="inline-flex items-center font-sans text-xs font-medium text-ink-muted bg-surface-dark rounded-full px-3 py-1 tracking-wide">
+                Packaging
+              </span>
+            </div>
+          </div>
+
+          <!-- Badges sólidos -->
+          <div>
+            <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Sólidos — fondo lleno</p>
+            <div class="flex flex-wrap gap-3">
+              <span class="inline-flex items-center font-sans text-xs font-light text-white bg-primary rounded-full px-4 py-1.5 tracking-wide">
+                Nuevo
+              </span>
+              <span class="inline-flex items-center font-sans text-xs font-light text-ink bg-secondary rounded-full px-4 py-1.5 tracking-wide">
+                Disponible
+              </span>
+              <span class="inline-flex items-center font-sans text-xs font-light text-ink bg-accent rounded-full px-4 py-1.5 tracking-wide">
+                Próximamente
+              </span>
+              <span class="inline-flex items-center font-sans text-xs font-light text-white bg-gold rounded-full px-4 py-1.5 tracking-wide">
+                Destacado
+              </span>
+              <span class="inline-flex items-center font-sans text-xs font-light text-white bg-ink rounded-full px-4 py-1.5 tracking-wide">
+                Agotado
+              </span>
+            </div>
+          </div>
+
+          <!-- Badge circular estilo moodboard -->
+          <div>
+            <p class="text-xs font-sans font-medium tracking-widest text-ink-subtle uppercase mb-4">Circular — como en el moodboard</p>
+            <div class="flex flex-wrap gap-6 items-center">
+              <div class="flex items-center justify-center w-20 h-20 rounded-full bg-gold text-white font-sans text-xs font-medium text-center leading-tight border-2 border-gold-dark">
+                Nuestra<br/>especialidad
+              </div>
+              <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary text-white font-sans text-xs font-medium text-center leading-tight border-2 border-primary-dark">
+                Lanzamiento<br/>10 Oct
+              </div>
+              <div class="flex items-center justify-center w-20 h-20 rounded-full border-2 border-ink text-ink font-sans text-xs font-medium text-center leading-tight">
+                Preventa<br/>28 Sep
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="mt-20 border-t border-surface-dark">
+    <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <p class="font-display text-lg font-light text-ink">Agencia Rosa — Design System</p>
+        <p class="font-sans text-xs text-ink-subtle mt-1">Generado desde moodboard · Abril 2026</p>
+      </div>
+      <div class="text-right">
+        <p class="font-sans text-xs text-ink-subtle">Tipografía: Cormorant Garamond + DM Sans</p>
+        <p class="font-sans text-xs text-ink-subtle mt-0.5">Primary: #d4693f · Secondary: #d8dca6 · Accent: #cdb8dc</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JS: Mobile sidebar toggle ==================== -->
+  <script>
+    // Toggle del sidebar en mobile — JS vanilla sin dependencias
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const sidebar   = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      // Alterna entre hidden y block para mostrar/ocultar el sidebar en mobile
+      sidebar.classList.toggle('hidden');
+      sidebar.classList.toggle('block');
+    });
+
+    // Cierra el sidebar al hacer click en un link de navegación (mejor UX en mobile)
+    sidebar.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        // Solo oculta en mobile (cuando el toggle button es visible)
+        if (window.innerWidth < 1024) {
+          sidebar.classList.add('hidden');
+          sidebar.classList.remove('block');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

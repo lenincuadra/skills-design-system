@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design System — Agencia Rosa</title>
+
+  <!-- tokens.js PRIMERO — define tailwind.config, CSS vars, componentes y fuentes -->
+  <script src="./tokens.js"></script>
+  <!-- Tailwind CDN DESPUÉS — lee tailwind.config definido arriba -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ── Infraestructura del styleguide (no va en tokens.js) ── */
+
+    /* Fallback explícito para font-display: Tailwind CDN puede no generar
+       esta utility si el config no se procesa a tiempo. La CSS var siempre
+       está disponible porque la inyecta tokens.js (Capa 2) de forma sincrónica. */
+    .font-display { font-family: var(--font-display) !important; }
+
+    html { scroll-behavior: smooth; }
+    [id] { scroll-margin-top: 5rem; }
+
+    /* Sidebar nav */
+    .sg-nav-link {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--color-ink-muted);
+      padding: 0.3rem 0;
+      text-decoration: none;
+      transition: color 0.15s ease, padding-left 0.15s ease;
+    }
+    .sg-nav-link:hover { color: var(--color-primary); padding-left: 0.25rem; }
+    .sg-nav-link.active { color: var(--color-primary); font-weight: 400; }
+
+    /* Etiqueta de sección */
+    .sg-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-sans);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-ink-subtle);
+      margin-bottom: 1.25rem;
+    }
+    .sg-label::before {
+      content: '';
+      display: block;
+      width: 1.25rem;
+      height: 1px;
+      background: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    /* ── SANDBOX ── */
+    .ds-sandbox {
+      border: 1px solid var(--color-surface-dark);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      margin-bottom: 1.75rem;
+    }
+    .ds-sandbox-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-surface-dark);
+    }
+    .ds-sandbox-title {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--color-ink-subtle);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .ds-tabs { display: flex; gap: 0; }
+    .ds-tab {
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--color-ink-subtle);
+      padding: 0.3rem 0.75rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ds-tab:hover  { color: var(--color-ink); }
+    .ds-tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+    .ds-panel {
+      display: none;
+      padding: 2.5rem 2rem;
+      background: #fff;
+      min-height: 9rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .ds-panel.active { display: flex; }
+
+    /* Panel de código */
+    .ds-code { border-top: 1px solid var(--color-surface-dark); }
+    .ds-code summary {
+      font-family: var(--font-sans); font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--color-ink-subtle); padding: 0.5rem 1rem;
+      cursor: pointer; background: var(--color-surface);
+      list-style: none; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .ds-code summary::before { content: '</>'; font-family: monospace; }
+    .ds-code pre {
+      margin: 0; padding: 1.25rem;
+      font-size: 0.75rem; line-height: 1.6; font-family: monospace;
+      background: var(--color-ink); color: #e8e4df;
+      overflow-x: auto; white-space: pre;
+    }
+    .ds-code code { color: inherit; }
+
+    /* Color del syntax en el código */
+    .ds-code .tag   { color: #e08f6f; }
+    .ds-code .attr  { color: #d8dca6; }
+    .ds-code .val   { color: #cdb8dc; }
+
+    /* Swatch de color */
+    .color-swatch {
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+    }
+    .color-swatch-preview { height: 5rem; }
+    .color-swatch-info {
+      background: #fff;
+      padding: 0.75rem 1rem;
+    }
+    .color-swatch-name  { font-family: var(--font-sans); font-size: 0.8rem; font-weight: 400; color: var(--color-ink); }
+    .color-swatch-hex   { font-family: monospace; font-size: 0.72rem; color: var(--color-ink-muted); margin-top: 0.1rem; }
+    .color-swatch-class { font-family: monospace; font-size: 0.68rem; color: var(--color-ink-subtle); margin-top: 0.1rem; }
+
+    /* Visual ruler de espaciado */
+    .spacing-row { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--color-surface-dark); }
+    .spacing-label { font-family: monospace; font-size: 0.72rem; color: var(--color-ink-subtle); width: 3rem; text-align: right; flex-shrink: 0; }
+    .spacing-bar { height: 1.25rem; background: var(--color-primary); border-radius: 0.25rem; opacity: 0.75; }
+    .spacing-desc { font-family: var(--font-sans); font-size: 0.72rem; color: var(--color-ink-muted); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ── HEADER ── -->
+  <header class="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-surface-dark">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div>
+        <a href="./index.html" class="font-display text-xl font-light text-ink hover:text-primary tracking-wide">Agencia Rosa</a>
+        <span class="font-sans text-xs text-ink-subtle ml-3 tracking-widest uppercase">Design System</span>
+      </div>
+      <a href="./index.html" class="btn-outline btn-sm hidden sm:inline-flex">← Ver landing</a>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 py-12 flex gap-14">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="hidden lg:block w-48 shrink-0">
+      <nav id="sg-sidebar" class="sticky top-24">
+        <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-4">Índice</p>
+        <div class="space-y-0.5">
+          <!-- Secciones fijas siempre presentes -->
+          <a class="sg-nav-link" href="#colores">Colores</a>
+          <a class="sg-nav-link" href="#tipografia">Tipografía</a>
+          <a class="sg-nav-link" href="#espaciado">Espaciado</a>
+          <!-- Secciones condicionales — se ocultan si el componente no existe en DS_COMPONENTS -->
+          <a class="sg-nav-link ds-nav-btn"       href="#comp-btn">Botones</a>
+          <a class="sg-nav-link ds-nav-input"     href="#comp-input">Inputs</a>
+          <a class="sg-nav-link ds-nav-card"      href="#comp-card">Cards</a>
+          <a class="sg-nav-link ds-nav-badge"     href="#comp-badge">Badges</a>
+          <a class="sg-nav-link ds-nav-nav"       href="#comp-nav">Nav</a>
+          <a class="sg-nav-link ds-nav-alert"     href="#comp-alert">Alerts</a>
+          <a class="sg-nav-link ds-nav-avatar"    href="#comp-avatar">Avatar</a>
+          <a class="sg-nav-link ds-nav-loader"    href="#comp-loader">Loaders</a>
+          <a class="sg-nav-link ds-nav-tab"       href="#comp-tab">Tabs</a>
+          <a class="sg-nav-link ds-nav-accordion" href="#comp-accordion">Accordion</a>
+        </div>
+        <div class="mt-6 pt-6 border-t border-surface-dark">
+          <p class="font-sans text-xs text-ink-subtle">tokens.js</p>
+          <p class="font-sans text-xs text-ink-subtle mt-0.5" id="comp-count">— componentes activos</p>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ── CONTENIDO ── -->
+    <main class="flex-1 min-w-0 space-y-20">
+
+      <!-- ═══════════════════════════════════════
+           COLORES — siempre visible
+      ═══════════════════════════════════════ -->
+      <section id="colores">
+        <div class="sg-label">Fundamentos</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Colores</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">
+          Paleta completa del sistema. Cambiar <code class="text-xs bg-surface-dark px-1 rounded">--color-primary</code>
+          en <code class="text-xs bg-surface-dark px-1 rounded">tokens.js</code> propaga el cambio a todos los archivos del proyecto.
+        </p>
+
+        <!-- Primary -->
+        <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-3">Primary — Terracota</p>
+        <div class="grid grid-cols-3 gap-3 mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#e08f6f;"></div>
+            <div class="color-swatch-info">
+              <p class="color-swatch-name">Light</p>
+              <p class="color-swatch-hex">#e08f6f</p>
+              <p class="color-swatch-class">bg-primary-light</p>
+            </div>
+          </div>
+          <div class="color-swatch" style="outline:2px solid #d4693f; outline-offset:3px;">
+            <div class="color-swatch-preview" style="background:#d4693f;"></div>
+            <div class="color-swatch-info">
+              <p class="color-swatch-name">Primary</p>
+              <p class="color-swatch-hex">#d4693f</p>
+              <p class="color-swatch-class">bg-primary</p>
+            </div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#b0502a;"></div>
+            <div class="color-swatch-info">
+              <p class="color-swatch-name">Dark</p>
+              <p class="color-swatch-hex">#b0502a</p>
+              <p class="color-swatch-class">bg-primary-dark</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary + Accent + Gold -->
+        <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-3">Secondary, Accent, Gold</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#d8dca6;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Secondary</p><p class="color-swatch-hex">#d8dca6</p><p class="color-swatch-class">bg-secondary</p></div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#cdb8dc;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Accent</p><p class="color-swatch-hex">#cdb8dc</p><p class="color-swatch-class">bg-accent</p></div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#c9a265;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Gold</p><p class="color-swatch-hex">#c9a265</p><p class="color-swatch-class">bg-gold</p></div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#f7f2ea; border:1px solid #ede5d8;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Surface</p><p class="color-swatch-hex">#f7f2ea</p><p class="color-swatch-class">bg-surface</p></div>
+          </div>
+        </div>
+
+        <!-- Ink scale -->
+        <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-3">Ink — Escala de texto</p>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#1c1917;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Ink</p><p class="color-swatch-hex">#1c1917</p><p class="color-swatch-class">text-ink</p></div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#6b6560;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Muted</p><p class="color-swatch-hex">#6b6560</p><p class="color-swatch-class">text-ink-muted</p></div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-swatch-preview" style="background:#a09890;"></div>
+            <div class="color-swatch-info"><p class="color-swatch-name">Subtle</p><p class="color-swatch-hex">#a09890</p><p class="color-swatch-class">text-ink-subtle</p></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ═══════════════════════════════════════
+           TIPOGRAFÍA — siempre visible
+      ═══════════════════════════════════════ -->
+      <section id="tipografia">
+        <div class="sg-label">Fundamentos</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Tipografía</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10"><span id="sg-font-display-name"></span> para títulos editoriales · <span id="sg-font-sans-name"></span> para UI y cuerpo</p>
+
+        <div class="space-y-4">
+          <!-- Display -->
+          <div class="bg-white rounded-xl shadow-soft p-8 mb-6">
+            <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-6">font-display — <span id="sg-font-display-label"></span></p>
+            <div class="space-y-3">
+              <div class="flex items-baseline gap-4 py-3 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">6xl</span>
+                <span class="font-display text-6xl font-light text-ink">Agencia Rosa</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-3 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">5xl</span>
+                <span class="font-display text-5xl font-light text-ink">Branding editorial</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-3 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">4xl</span>
+                <span class="font-display text-4xl font-light text-ink">Diseño y desarrollo web</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-3 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">3xl</span>
+                <span class="font-display text-3xl font-light italic text-ink">The Vision Process</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-3">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">2xl</span>
+                <span class="font-display text-2xl font-light text-ink">Nuestra especialidad es el branding</span>
+              </div>
+            </div>
+          </div>
+          <!-- Sans -->
+          <div class="bg-white rounded-xl shadow-soft p-8">
+            <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-6">font-sans — <span id="sg-font-sans-label"></span></p>
+            <div class="space-y-2">
+              <div class="flex items-baseline gap-4 py-2.5 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">xl</span>
+                <span class="font-sans text-xl font-light text-ink">Trabajemos la marca completa</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-2.5 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">lg</span>
+                <span class="font-sans text-lg font-light text-ink">Servicios, tienda, portfolio</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-2.5 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">base</span>
+                <span class="font-sans text-base font-light text-ink">Aprendés a crear una buena dirección creativa y a construir el concepto de una marca.</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-2.5 border-b border-surface-dark">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">sm</span>
+                <span class="font-sans text-sm text-ink-muted font-light">Términos y condiciones · Política de privacidad</span>
+              </div>
+              <div class="flex items-baseline gap-4 py-2.5">
+                <span class="font-sans text-xs text-ink-subtle w-8 shrink-0 text-right">xs</span>
+                <span class="font-sans text-xs text-ink-subtle tracking-widest uppercase font-medium">Categorías · Etiquetas · Metadata</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ═══════════════════════════════════════
+           ESPACIADO — siempre visible
+      ═══════════════════════════════════════ -->
+      <section id="espaciado">
+        <div class="sg-label">Fundamentos</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Espaciado</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Escala base 4px. El diseño respira — usar valores generosos.</p>
+        <div class="bg-white rounded-xl shadow-soft p-8">
+          <div class="space-y-1">
+            <div class="spacing-row"><span class="spacing-label">1</span><div class="spacing-bar" style="width:0.25rem;"></div><span class="spacing-desc">4px — gaps micro</span></div>
+            <div class="spacing-row"><span class="spacing-label">2</span><div class="spacing-bar" style="width:0.5rem;"></div><span class="spacing-desc">8px — padding tight</span></div>
+            <div class="spacing-row"><span class="spacing-label">4</span><div class="spacing-bar" style="width:1rem;"></div><span class="spacing-desc">16px — padding base</span></div>
+            <div class="spacing-row"><span class="spacing-label">6</span><div class="spacing-bar" style="width:1.5rem;"></div><span class="spacing-desc">24px — padding cards</span></div>
+            <div class="spacing-row"><span class="spacing-label">8</span><div class="spacing-bar" style="width:2rem;"></div><span class="spacing-desc">32px — secciones internas</span></div>
+            <div class="spacing-row"><span class="spacing-label">12</span><div class="spacing-bar" style="width:3rem;"></div><span class="spacing-desc">48px — separación entre bloques</span></div>
+            <div class="spacing-row"><span class="spacing-label">16</span><div class="spacing-bar" style="width:4rem;"></div><span class="spacing-desc">64px — secciones de página</span></div>
+            <div class="spacing-row"><span class="spacing-label">20</span><div class="spacing-bar" style="width:5rem;"></div><span class="spacing-desc">80px — hero y secciones generosas</span></div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ═══════════════════════════════════════
+           COMPONENTES CONDICIONALES
+           Cada uno se muestra/oculta según DS_COMPONENTS
+      ═══════════════════════════════════════ -->
+
+      <!-- BOTONES -->
+      <section id="comp-btn" class="ds-section" data-component="btn">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Botones</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">
+          Clases: <code class="text-xs bg-surface-dark px-1 rounded">btn-primary</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">btn-secondary</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">btn-outline</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">btn-ghost</code> +
+          <code class="text-xs bg-surface-dark px-1 rounded">btn-sm</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">btn-lg</code>
+        </p>
+
+        <!-- Sandbox: Primary -->
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">btn-primary</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="default">Default</button>
+              <button class="ds-tab" data-tab="hover">Hover</button>
+              <button class="ds-tab" data-tab="disabled">Disabled</button>
+              <button class="ds-tab" data-tab="loading">Loading</button>
+              <button class="ds-tab" data-tab="sizes">Tamaños</button>
+              <button class="ds-tab" data-tab="icon">Con ícono</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="default">
+            <button class="btn-primary">Guardar cambios</button>
+          </div>
+          <div class="ds-panel" data-panel="hover">
+            <button class="btn-primary" style="background:var(--color-primary-dark);">Guardar cambios</button>
+          </div>
+          <div class="ds-panel" data-panel="disabled">
+            <button class="btn-primary" disabled style="opacity:0.45;cursor:not-allowed;">Guardar cambios</button>
+          </div>
+          <div class="ds-panel" data-panel="loading">
+            <button class="btn-primary btn-loading" disabled style="min-width:9rem;">Guardando…</button>
+          </div>
+          <div class="ds-panel" data-panel="sizes">
+            <button class="btn-primary btn-sm">Pequeño</button>
+            <button class="btn-primary">Mediano</button>
+            <button class="btn-primary btn-lg">Grande</button>
+          </div>
+          <div class="ds-panel" data-panel="icon">
+            <button class="btn-primary" data-icon="↗">Trabajemos juntos</button>
+            <button class="btn-primary" data-icon="→">Ver portfolio</button>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;button class="btn-primary"&gt;Guardar cambios&lt;/button&gt;
+&lt;button class="btn-primary" disabled&gt;Disabled&lt;/button&gt;
+&lt;button class="btn-primary btn-loading" disabled&gt;Loading&lt;/button&gt;
+&lt;button class="btn-primary btn-sm"&gt;Pequeño&lt;/button&gt;
+&lt;button class="btn-primary btn-lg"&gt;Grande&lt;/button&gt;
+&lt;button class="btn-primary" data-icon="↗"&gt;Con ícono&lt;/button&gt;</code></pre>
+          </details>
+        </div>
+
+        <!-- Sandbox: Todas las variantes -->
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">Todas las variantes</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="all">Vista general</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="all">
+            <button class="btn-primary">Primary</button>
+            <button class="btn-secondary">Secondary</button>
+            <button class="btn-outline">Outline</button>
+            <button class="btn-ghost">Ghost</button>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;button class="btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn-secondary"&gt;Secondary&lt;/button&gt;
+&lt;button class="btn-outline"&gt;Outline&lt;/button&gt;
+&lt;button class="btn-ghost"&gt;Ghost&lt;/button&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- INPUTS -->
+      <section id="comp-input" class="ds-section" data-component="input">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Inputs</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">
+          Clase base: <code class="text-xs bg-surface-dark px-1 rounded">input-base</code>.
+          Modificadores: <code class="text-xs bg-surface-dark px-1 rounded">input-error</code>
+        </p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">input-base</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="default">Default</button>
+              <button class="ds-tab" data-tab="focus">Focus</button>
+              <button class="ds-tab" data-tab="filled">Filled</button>
+              <button class="ds-tab" data-tab="error">Error</button>
+              <button class="ds-tab" data-tab="disabled">Disabled</button>
+              <button class="ds-tab" data-tab="select">Select</button>
+              <button class="ds-tab" data-tab="textarea">Textarea</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="default" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Email *</label>
+            <input class="input-base" type="email" placeholder="tu@email.com" />
+          </div>
+          <div class="ds-panel" data-panel="focus" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Email *</label>
+            <input class="input-base" type="email" value="hola@agenciarosa.com" style="border-color:var(--color-primary);box-shadow:0 0 0 3px rgba(212,105,63,0.12);" />
+          </div>
+          <div class="ds-panel" data-panel="filled" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Nombre</label>
+            <input class="input-base" type="text" value="Agencia Rosa" />
+          </div>
+          <div class="ds-panel" data-panel="error" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Teléfono</label>
+            <input class="input-base input-error" type="tel" value="abc123" />
+            <p class="input-error-msg">Ingresá un número válido.</p>
+          </div>
+          <div class="ds-panel" data-panel="disabled" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Campo bloqueado</label>
+            <input class="input-base" type="text" value="No editable" disabled />
+            <p class="input-hint">Este campo no puede editarse.</p>
+          </div>
+          <div class="ds-panel" data-panel="select" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Servicio</label>
+            <select class="input-base">
+              <option value="">Seleccioná un servicio</option>
+              <option>Branding</option>
+              <option>Diseño web</option>
+              <option>Packaging</option>
+            </select>
+          </div>
+          <div class="ds-panel" data-panel="textarea" style="align-items:flex-start; flex-direction:column; max-width:24rem; margin:0 auto;">
+            <label class="input-label">Mensaje</label>
+            <textarea class="input-base" rows="3" placeholder="Contanos sobre tu proyecto…"></textarea>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;label class="input-label"&gt;Email *&lt;/label&gt;
+&lt;input class="input-base" type="email" placeholder="tu@email.com" /&gt;
+
+&lt;!-- Error --&gt;
+&lt;input class="input-base input-error" /&gt;
+&lt;p class="input-error-msg"&gt;Mensaje de error&lt;/p&gt;
+
+&lt;!-- Disabled --&gt;
+&lt;input class="input-base" disabled /&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- CARDS -->
+      <section id="comp-card" class="ds-section" data-component="card">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Cards</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">
+          Variantes: <code class="text-xs bg-surface-dark px-1 rounded">card</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">card-image</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">card-elevated</code>
+          <code class="text-xs bg-surface-dark px-1 rounded">card-flat</code>
+        </p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">card</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="basic">Básica</button>
+              <button class="ds-tab" data-tab="image">Con imagen</button>
+              <button class="ds-tab" data-tab="elevated">Elevated</button>
+              <button class="ds-tab" data-tab="flat">Flat</button>
+              <button class="ds-tab" data-tab="skeleton">Skeleton</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="basic">
+            <div class="card" style="max-width:18rem; width:100%;">
+              <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Servicio</p>
+              <h3 class="font-display text-2xl font-light text-ink mb-2">Branding completo</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mb-4">Una marca completa que inspira y conecta con tu audiencia.</p>
+              <button class="btn-outline btn-sm">Quiero saber más</button>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="image">
+            <div class="card-image" style="max-width:18rem; width:100%;">
+              <div style="height:9rem; background:var(--color-secondary); display:flex; align-items:center; justify-content:center;">
+                <span class="font-display text-2xl font-light italic" style="color:var(--color-secondary-dark);">The Vision Process</span>
+              </div>
+              <div class="card" style="border-radius:0; box-shadow:none;">
+                <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-1">Curso</p>
+                <h3 class="font-display text-xl font-light text-ink mb-3">Dirección creativa</h3>
+                <button class="btn-primary btn-sm">Inscribirme</button>
+              </div>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="elevated">
+            <div class="card-elevated" style="max-width:18rem; width:100%; padding:1.5rem;">
+              <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Destacado</p>
+              <h3 class="font-display text-2xl font-light text-ink mb-2">Packaging</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mb-4">Nuestra especialidad — diseño de empaque con alma.</p>
+              <div style="display:flex; gap:0.5rem;">
+                <button class="btn-primary btn-sm">Ver ejemplos</button>
+                <button class="btn-outline btn-sm">Contactar</button>
+              </div>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="flat">
+            <div class="card-flat" style="max-width:18rem; width:100%;">
+              <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-2">Info</p>
+              <h3 class="font-display text-2xl font-light text-ink mb-2">Contenido</h3>
+              <p class="font-sans text-sm font-light text-ink-muted">Imágenes y piezas que comunican la esencia de tu marca.</p>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="skeleton">
+            <div class="card" style="max-width:18rem; width:100%;">
+              <div class="skeleton skeleton-title" style="width:40%;"></div>
+              <div class="skeleton skeleton-text" style="width:100%;"></div>
+              <div class="skeleton skeleton-text" style="width:85%;"></div>
+              <div class="skeleton skeleton-text" style="width:60%; margin-bottom:1rem;"></div>
+              <div class="skeleton" style="height:2rem; width:8rem; border-radius:9999px;"></div>
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;div class="card"&gt;...&lt;/div&gt;
+&lt;div class="card-image"&gt;...&lt;/div&gt;
+&lt;div class="card-elevated"&gt;...&lt;/div&gt;
+&lt;div class="card-flat"&gt;...&lt;/div&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- BADGES -->
+      <section id="comp-badge" class="ds-section" data-component="badge">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Badges</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Clase base <code class="text-xs bg-surface-dark px-1 rounded">badge</code> + variante semántica.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">badge</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="all">Todas</button>
+              <button class="ds-tab" data-tab="semantic">Semánticas</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="all" style="flex-wrap:wrap; gap:0.5rem;">
+            <span class="badge badge-primary">Branding</span>
+            <span class="badge badge-secondary">Contenido</span>
+            <span class="badge badge-accent">Diseño web</span>
+            <span class="badge badge-gold">Especialidad</span>
+            <span class="badge badge-neutral">Packaging</span>
+            <span class="badge badge-solid">Nuevo</span>
+          </div>
+          <div class="ds-panel" data-panel="semantic" style="flex-wrap:wrap; gap:0.5rem;">
+            <span class="badge badge-success">Publicado</span>
+            <span class="badge badge-warning">Borrador</span>
+            <span class="badge badge-danger">Archivado</span>
+            <span class="badge badge-neutral">Sin estado</span>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;span class="badge badge-primary"&gt;Branding&lt;/span&gt;
+&lt;span class="badge badge-secondary"&gt;Contenido&lt;/span&gt;
+&lt;span class="badge badge-solid"&gt;Nuevo&lt;/span&gt;
+&lt;span class="badge badge-success"&gt;Publicado&lt;/span&gt;
+&lt;span class="badge badge-warning"&gt;Borrador&lt;/span&gt;
+&lt;span class="badge badge-danger"&gt;Archivado&lt;/span&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- NAV -->
+      <section id="comp-nav" class="ds-section" data-component="nav">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Nav</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Barra de navegación principal. Clase <code class="text-xs bg-surface-dark px-1 rounded">nav</code>.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">nav</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="desktop">Desktop</button>
+              <button class="ds-tab" data-tab="mobile">Mobile</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="desktop" style="padding:0; display:block;">
+            <div style="background:rgba(247,242,234,0.95); border-bottom:1px solid var(--color-surface-dark);">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem;">
+                <a class="nav-logo">Agencia Rosa</a>
+                <nav style="display:flex; gap:2rem;">
+                  <a class="nav-link" href="#">Servicios</a>
+                  <a class="nav-link" href="#">Tienda</a>
+                  <a class="nav-link" href="#">Nosotras</a>
+                  <a class="nav-link" href="#">Contacto</a>
+                </nav>
+                <button class="btn-outline btn-sm">Trabajemos juntos ↗</button>
+              </div>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="mobile" style="padding:0; display:none;">
+            <div style="background:var(--color-surface); width:100%;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem; border-bottom:1px solid var(--color-surface-dark);">
+                <a class="nav-logo">Agencia Rosa</a>
+                <span style="font-size:1.25rem; color:var(--color-ink-muted);">☰</span>
+              </div>
+              <div style="padding:1.25rem 1.5rem; display:flex; flex-direction:column; gap:1rem; border-bottom:1px solid var(--color-surface-dark);">
+                <a class="nav-link" href="#">Servicios</a>
+                <a class="nav-link" href="#">Tienda</a>
+                <a class="nav-link" href="#">Nosotras</a>
+                <a class="nav-link" href="#">Contacto</a>
+                <button class="btn-outline btn-sm" style="align-self:flex-start; margin-top:0.5rem;">Trabajemos juntos ↗</button>
+              </div>
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;header class="nav"&gt;
+  &lt;div class="nav-inner"&gt;
+    &lt;a class="nav-logo" href="/"&gt;Agencia Rosa&lt;/a&gt;
+    &lt;nav&gt;
+      &lt;a class="nav-link" href="#"&gt;Servicios&lt;/a&gt;
+    &lt;/nav&gt;
+    &lt;button class="btn-outline btn-sm"&gt;Trabajemos juntos ↗&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/header&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- ALERTS -->
+      <section id="comp-alert" class="ds-section" data-component="alert">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Alerts</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Clase base <code class="text-xs bg-surface-dark px-1 rounded">alert</code> + variante semántica.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">alert</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="all">Todas</button>
+              <button class="ds-tab" data-tab="action">Con acción</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="all" style="flex-direction:column; align-items:stretch; gap:0.75rem; max-width:28rem; margin:0 auto;">
+            <div class="alert alert-success"><span class="alert-icon">✓</span> Tu proyecto fue enviado correctamente.</div>
+            <div class="alert alert-warning"><span class="alert-icon">⚠</span> Revisá los datos antes de continuar.</div>
+            <div class="alert alert-danger"><span class="alert-icon">✕</span> No se pudo procesar el pago.</div>
+            <div class="alert alert-info"><span class="alert-icon">ℹ</span> El acceso al curso se habilita en 24hs.</div>
+          </div>
+          <div class="ds-panel" data-panel="action" style="flex-direction:column; align-items:stretch; max-width:28rem; margin:0 auto;">
+            <div class="alert alert-success" style="justify-content:space-between;">
+              <div style="display:flex; gap:0.75rem; align-items:flex-start;"><span class="alert-icon">✓</span> Tu pago fue procesado.</div>
+              <button class="btn-ghost btn-sm" style="flex-shrink:0; text-decoration:none; opacity:0.6; font-size:0.75rem;">✕</button>
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;div class="alert alert-success"&gt;
+  &lt;span class="alert-icon"&gt;✓&lt;/span&gt;
+  Mensaje de éxito.
+&lt;/div&gt;
+&lt;div class="alert alert-warning"&gt;...&lt;/div&gt;
+&lt;div class="alert alert-danger"&gt;...&lt;/div&gt;
+&lt;div class="alert alert-info"&gt;...&lt;/div&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- AVATAR -->
+      <section id="comp-avatar" class="ds-section" data-component="avatar">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Avatar</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Clase base <code class="text-xs bg-surface-dark px-1 rounded">avatar</code> + tamaño. Con estado online/offline.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">avatar</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="initials">Iniciales</button>
+              <button class="ds-tab" data-tab="sizes">Tamaños</button>
+              <button class="ds-tab" data-tab="status">Con estado</button>
+              <button class="ds-tab" data-tab="group">Grupo</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="initials" style="gap:1rem;">
+            <div class="avatar avatar-md" style="background:var(--color-secondary);">AR</div>
+            <div class="avatar avatar-md" style="background:var(--color-accent);">MG</div>
+            <div class="avatar avatar-md" style="background:var(--color-primary); color:#fff;">LP</div>
+          </div>
+          <div class="ds-panel" data-panel="sizes" style="gap:1rem; align-items:center;">
+            <div class="avatar avatar-sm" style="background:var(--color-secondary);">SM</div>
+            <div class="avatar avatar-md" style="background:var(--color-secondary);">MD</div>
+            <div class="avatar avatar-lg" style="background:var(--color-secondary);">LG</div>
+            <div class="avatar avatar-xl" style="background:var(--color-secondary);">XL</div>
+          </div>
+          <div class="ds-panel" data-panel="status" style="gap:1.5rem;">
+            <div class="avatar-wrap">
+              <div class="avatar avatar-md" style="background:var(--color-secondary);">AR</div>
+              <span class="avatar-status avatar-online"></span>
+            </div>
+            <div class="avatar-wrap">
+              <div class="avatar avatar-md" style="background:var(--color-secondary);">MG</div>
+              <span class="avatar-status avatar-offline"></span>
+            </div>
+            <div class="avatar-wrap">
+              <div class="avatar avatar-md" style="background:var(--color-accent);">LP</div>
+              <span class="avatar-status avatar-busy"></span>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="group">
+            <div style="display:flex;">
+              <div class="avatar avatar-md" style="background:var(--color-secondary); margin-right:-0.625rem; border:2px solid white; z-index:3;">AR</div>
+              <div class="avatar avatar-md" style="background:var(--color-accent); margin-right:-0.625rem; border:2px solid white; z-index:2;">MG</div>
+              <div class="avatar avatar-md" style="background:var(--color-primary); color:#fff; border:2px solid white; z-index:1;">LP</div>
+              <div class="avatar avatar-md" style="background:var(--color-surface-dark); color:var(--color-ink-muted); border:2px solid white; font-size:0.7rem;">+4</div>
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;div class="avatar avatar-md"&gt;AR&lt;/div&gt;
+
+&lt;!-- Con estado --&gt;
+&lt;div class="avatar-wrap"&gt;
+  &lt;div class="avatar avatar-md"&gt;AR&lt;/div&gt;
+  &lt;span class="avatar-status avatar-online"&gt;&lt;/span&gt;
+&lt;/div&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- LOADERS -->
+      <section id="comp-loader" class="ds-section" data-component="loader">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Loaders</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Spinners, skeletons y barra de progreso.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">loader</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="spinner">Spinner</button>
+              <button class="ds-tab" data-tab="skeleton">Skeleton</button>
+              <button class="ds-tab" data-tab="progress">Progress</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="spinner" style="gap:2rem; align-items:center;">
+            <div class="loader-spinner sm"></div>
+            <div class="loader-spinner md"></div>
+            <div class="loader-spinner lg"></div>
+          </div>
+          <div class="ds-panel" data-panel="skeleton" style="flex-direction:column; align-items:stretch; max-width:20rem; margin:0 auto;">
+            <div class="card" style="box-shadow:none; border:1px solid var(--color-surface-dark);">
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+                <div class="skeleton skeleton-avatar"></div>
+                <div style="flex:1;">
+                  <div class="skeleton skeleton-text" style="width:60%;"></div>
+                  <div class="skeleton skeleton-text" style="width:40%;"></div>
+                </div>
+              </div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text" style="width:80%;"></div>
+              <div class="skeleton skeleton-text" style="width:60%;"></div>
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="progress" style="flex-direction:column; gap:1rem; width:100%; max-width:24rem; margin:0 auto;">
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.375rem;">
+                <span style="font-family:var(--font-sans); font-size:0.75rem; color:var(--color-ink-muted);">Progreso del proyecto</span>
+                <span style="font-family:var(--font-sans); font-size:0.75rem; color:var(--color-ink);">75%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:75%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.375rem;">
+                <span style="font-family:var(--font-sans); font-size:0.75rem; color:var(--color-ink-muted);">Carga del archivo</span>
+                <span style="font-family:var(--font-sans); font-size:0.75rem; color:var(--color-ink);">40%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:40%; background:var(--color-secondary-dark);"></div></div>
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;div class="loader-spinner md"&gt;&lt;/div&gt;
+
+&lt;!-- Skeleton --&gt;
+&lt;div class="skeleton skeleton-text"&gt;&lt;/div&gt;
+&lt;div class="skeleton skeleton-title"&gt;&lt;/div&gt;
+&lt;div class="skeleton skeleton-avatar"&gt;&lt;/div&gt;
+
+&lt;!-- Progress --&gt;
+&lt;div class="progress-track"&gt;
+  &lt;div class="progress-fill" style="width:75%;"&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- TABS -->
+      <section id="comp-tab" class="ds-section" data-component="tab">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Tabs</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Clase <code class="text-xs bg-surface-dark px-1 rounded">tabs-bar</code> + <code class="text-xs bg-surface-dark px-1 rounded">tab</code>.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">tab</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="default">Default</button>
+              <button class="ds-tab" data-tab="counter">Con contador</button>
+              <button class="ds-tab" data-tab="disabled">Con disabled</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="default" style="flex-direction:column; align-items:stretch; padding:0;">
+            <div class="tabs-bar" style="padding:0 1.5rem;">
+              <button class="tab active">Servicios</button>
+              <button class="tab">Tienda</button>
+              <button class="tab">Portfolio</button>
+            </div>
+            <div style="padding:1.5rem; font-family:var(--font-sans); font-size:0.875rem; color:var(--color-ink-muted);">
+              Contenido de la pestaña activa.
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="counter" style="flex-direction:column; align-items:stretch; padding:0;">
+            <div class="tabs-bar" style="padding:0 1.5rem;">
+              <button class="tab active">Proyectos <span class="tab-count">12</span></button>
+              <button class="tab">Borradores <span class="tab-count">3</span></button>
+              <button class="tab">Archivados <span class="tab-count">28</span></button>
+            </div>
+            <div style="padding:1.5rem; font-family:var(--font-sans); font-size:0.875rem; color:var(--color-ink-muted);">
+              Lista de proyectos activos.
+            </div>
+          </div>
+          <div class="ds-panel" data-panel="disabled" style="flex-direction:column; align-items:stretch; padding:0;">
+            <div class="tabs-bar" style="padding:0 1.5rem;">
+              <button class="tab active">Disponible</button>
+              <button class="tab">Disponible</button>
+              <button class="tab" disabled>Sin acceso</button>
+            </div>
+            <div style="padding:1.5rem; font-family:var(--font-sans); font-size:0.875rem; color:var(--color-ink-muted);">
+              La tercera pestaña está deshabilitada.
+            </div>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;div class="tabs-bar"&gt;
+  &lt;button class="tab active"&gt;Servicios&lt;/button&gt;
+  &lt;button class="tab"&gt;Tienda&lt;/button&gt;
+  &lt;button class="tab" disabled&gt;Sin acceso&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Con contador --&gt;
+&lt;button class="tab active"&gt;
+  Proyectos &lt;span class="tab-count"&gt;12&lt;/span&gt;
+&lt;/button&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+
+      <!-- ACCORDION -->
+      <section id="comp-accordion" class="ds-section" data-component="accordion">
+        <div class="sg-label">Componentes</div>
+        <h2 class="font-display text-5xl font-light text-ink mb-2">Accordion</h2>
+        <p class="font-sans text-sm font-light text-ink-muted mb-10">Usa el elemento nativo <code class="text-xs bg-surface-dark px-1 rounded">&lt;details&gt;</code> con clase <code class="text-xs bg-surface-dark px-1 rounded">accordion</code>.</p>
+        <div class="ds-sandbox">
+          <div class="ds-sandbox-header">
+            <span class="ds-sandbox-title">accordion</span>
+            <div class="ds-tabs">
+              <button class="ds-tab active" data-tab="default">Default</button>
+              <button class="ds-tab" data-tab="open">Abierto</button>
+            </div>
+          </div>
+          <div class="ds-panel active" data-panel="default" style="flex-direction:column; align-items:stretch; max-width:28rem; margin:0 auto;">
+            <details class="accordion">
+              <summary class="accordion-trigger">¿Cuánto tarda un proyecto de branding?</summary>
+              <div class="accordion-body">Depende del alcance, pero generalmente entre 4 y 8 semanas desde el inicio hasta la entrega final.</div>
+            </details>
+            <details class="accordion">
+              <summary class="accordion-trigger">¿Trabajan con marcas de cualquier industria?</summary>
+              <div class="accordion-body">Sí, aunque tenemos experiencia especial en moda, gastronomía, belleza y servicios creativos.</div>
+            </details>
+            <details class="accordion">
+              <summary class="accordion-trigger">¿Qué incluye el servicio de branding completo?</summary>
+              <div class="accordion-body">Logo, paleta de colores, tipografía, manual de marca, aplicaciones básicas y archivos editables.</div>
+            </details>
+          </div>
+          <div class="ds-panel" data-panel="open" style="flex-direction:column; align-items:stretch; max-width:28rem; margin:0 auto;">
+            <details class="accordion" open>
+              <summary class="accordion-trigger">¿Cuánto tarda un proyecto de branding?</summary>
+              <div class="accordion-body">Depende del alcance, pero generalmente entre 4 y 8 semanas desde el inicio hasta la entrega final.</div>
+            </details>
+            <details class="accordion">
+              <summary class="accordion-trigger">¿Trabajan con marcas de cualquier industria?</summary>
+              <div class="accordion-body">Sí, aunque tenemos experiencia especial en moda, gastronomía, belleza y servicios creativos.</div>
+            </details>
+          </div>
+          <details class="ds-code">
+            <summary>Ver HTML</summary>
+            <pre><code>&lt;details class="accordion"&gt;
+  &lt;summary class="accordion-trigger"&gt;
+    Pregunta frecuente
+  &lt;/summary&gt;
+  &lt;div class="accordion-body"&gt;
+    Respuesta detallada.
+  &lt;/div&gt;
+&lt;/details&gt;</code></pre>
+          </details>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 border-t border-surface-dark">
+    <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <p class="font-display text-lg font-light text-ink">Agencia Rosa — Design System</p>
+        <p class="font-sans text-xs text-ink-subtle mt-1">tokens.js · styleguide.html · Abril 2026</p>
+      </div>
+      <div class="text-right">
+        <p class="font-sans text-xs text-ink-subtle">Componentes activos: <span id="footer-comp-list"></span></p>
+        <p class="font-sans text-xs text-ink-subtle mt-0.5">#d4693f · #d8dca6 · #cdb8dc · <span id="sg-footer-fonts"></span></p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script>
+    // ── 0. Inicializar sandboxes ──────────────────────────────
+    // Establece el estado inicial de cada panel via JS (inline style)
+    // en lugar de depender solo de CSS, para evitar problemas de
+    // cascada con Tailwind CDN que inyecta su CSS después que tokens.js.
+    // También guarda el display correcto en data-show-display para
+    // reutilizarlo al cambiar tabs (algunos paneles usan block, otros flex).
+    (function initSandboxes() {
+      document.querySelectorAll('.ds-sandbox').forEach(sandbox => {
+        sandbox.querySelectorAll('.ds-panel').forEach(p => {
+          const isActive  = p.classList.contains('active');
+          // Leer el display inline original (ej: "block" para el panel de nav desktop)
+          // Si no tiene, el default es "flex"
+          const inline    = p.style.display;
+          const showAs    = (inline && inline !== 'none') ? inline : 'flex';
+          p.dataset.showDisplay = showAs;          // guardar para tab switching
+          p.style.display = isActive ? showAs : 'none'; // aplicar estado inicial
+        });
+      });
+    })();
+
+
+    // ── 0b. Nombres de fuentes dinámicos ─────────────────────
+    // Lee window.DS_TOKENS de tokens.js para mostrar los nombres reales
+    // de las fuentes. Nunca hardcodear nombres de fuentes en el HTML.
+    (function renderFontNames() {
+      const t = window.DS_TOKENS || {};
+      const display = t.fontDisplay || '—';
+      const sans    = t.fontSans    || '—';
+      ['sg-font-display-name', 'sg-font-display-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = display;
+      });
+      ['sg-font-sans-name', 'sg-font-sans-label'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = sans;
+      });
+      const footer = document.getElementById('sg-footer-fonts');
+      if (footer) footer.textContent = display + ' + ' + sans;
+    })();
+
+
+    // ── 1. Renderizado condicional ────────────────────────────
+    // Lee window.DS_COMPONENTS de tokens.js y oculta las secciones
+    // y links de nav de los componentes que no están registrados.
+
+    function hasComponent(name) {
+      return Array.isArray(window.DS_COMPONENTS) && window.DS_COMPONENTS.includes(name);
+    }
+
+    document.querySelectorAll('.ds-section').forEach(section => {
+      const name = section.dataset.component;
+      if (!hasComponent(name)) {
+        section.style.display = 'none';
+        // Ocultar el link correspondiente en el sidebar
+        const navLink = document.querySelector(`.ds-nav-${name}`);
+        if (navLink) navLink.style.display = 'none';
+      }
+    });
+
+    // Contador en sidebar y footer
+    const count = window.DS_COMPONENTS ? window.DS_COMPONENTS.length : 0;
+    document.getElementById('comp-count').textContent = `${count} componentes activos`;
+    document.getElementById('footer-comp-list').textContent =
+      (window.DS_COMPONENTS || []).join(', ');
+
+
+    // ── 2. Sandbox tab switching ──────────────────────────────
+    // Activa el panel correcto al hacer click en un tab del sandbox.
+
+    document.querySelectorAll('.ds-sandbox').forEach(sandbox => {
+      sandbox.querySelectorAll('.ds-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.tab;
+          // Desactivar todos los tabs y paneles del sandbox
+          sandbox.querySelectorAll('.ds-tab').forEach(t => t.classList.remove('active'));
+          sandbox.querySelectorAll('.ds-panel').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+          });
+          // Activar el seleccionado
+          tab.classList.add('active');
+          const panel = sandbox.querySelector(`[data-panel="${target}"]`);
+          if (panel) {
+            panel.classList.add('active');
+            // Usar el display guardado (block, flex, etc.) no siempre flex
+            panel.style.display = panel.dataset.showDisplay || 'flex';
+          }
+        });
+      });
+    });
+
+
+    // ── 3. Active link en sidebar al hacer scroll ─────────────
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.sg-nav-link');
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const link = document.querySelector(`.sg-nav-link[href="#${entry.target.id}"]`);
+          if (link) link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>

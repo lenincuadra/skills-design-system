@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agencia Rosa — Branding, Contenido y Diseño Web</title>
+
+  <!-- Google Fonts — Cormorant Garamond (display) + DM Sans (cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN con design system tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:   { DEFAULT: '#d4693f', light: '#e08f6f', dark: '#b0502a' },
+            secondary: { DEFAULT: '#d8dca6', light: '#eaeccc', dark: '#b8be7c' },
+            accent:    { DEFAULT: '#cdb8dc', light: '#e2d6ed', dark: '#a88fc0' },
+            gold:      { DEFAULT: '#c9a265', light: '#dfc08e', dark: '#a07e42' },
+            surface:   { DEFAULT: '#f7f2ea', dark: '#ede5d8' },
+            ink:       { DEFAULT: '#1c1917', muted: '#6b6560', subtle: '#a09890' },
+          },
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            sans:    ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 2px 12px 0 rgba(28,25,23,0.07)',
+            card: '0 4px 24px 0 rgba(28,25,23,0.09)',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --color-primary: #d4693f;
+      --color-surface: #f7f2ea;
+      --color-ink:     #1c1917;
+      --font-display:  'Cormorant Garamond', Georgia, serif;
+      --font-sans:     'DM Sans', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--color-surface);
+      color: var(--color-ink);
+    }
+
+    /* Transiciones globales para elementos interactivos */
+    a, button { transition: all 0.2s ease; }
+
+    /* Animación de entrada suave al hacer scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Línea decorativa bajo los títulos de sección */
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 1.5rem;
+      height: 1px;
+      background: var(--color-primary);
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    /* Cursor custom para el nav */
+    nav a:hover { color: var(--color-primary); }
+
+    /* Imagen en escala de grises con transición a color en hover */
+    .img-bw {
+      filter: grayscale(30%);
+      transition: filter 0.4s ease;
+    }
+    .img-bw:hover { filter: grayscale(0%); }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ================================================
+       NAV — sticky, ligero, fondo crema
+  ================================================ -->
+  <header class="sticky top-0 z-50 bg-surface/95 backdrop-blur-sm border-b border-surface-dark">
+    <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="#" class="font-display text-xl font-light text-ink tracking-wide hover:text-primary">
+        Agencia Rosa
+      </a>
+
+      <!-- Nav desktop -->
+      <nav class="hidden lg:flex items-center gap-8 font-sans text-sm font-light text-ink-muted">
+        <a href="#servicios" class="hover:text-primary">Servicios</a>
+        <a href="#tienda" class="hover:text-primary">Tienda</a>
+        <a href="#nosotras" class="hover:text-primary">Nosotras</a>
+        <a href="#contacto" class="hover:text-primary">Contacto</a>
+        <a href="#portfolio" class="hover:text-primary">Portfolio</a>
+      </nav>
+
+      <!-- CTA principal del nav — estilo outline tal como en el moodboard -->
+      <a
+        href="#contacto"
+        class="hidden lg:inline-flex items-center gap-1.5 font-sans text-sm font-light text-ink border border-ink rounded-full px-5 py-2 hover:border-primary hover:text-primary"
+      >
+        Trabajemos juntos
+        <span class="text-xs">↗</span>
+      </a>
+
+      <!-- Hamburger mobile -->
+      <button id="menu-toggle" class="lg:hidden text-ink-muted hover:text-primary">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path id="menu-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden lg:hidden border-t border-surface-dark bg-surface px-6 py-5">
+      <nav class="flex flex-col gap-4 font-sans text-sm font-light text-ink-muted">
+        <a href="#servicios" class="hover:text-primary">Servicios</a>
+        <a href="#tienda" class="hover:text-primary">Tienda</a>
+        <a href="#nosotras" class="hover:text-primary">Nosotras</a>
+        <a href="#contacto" class="hover:text-primary">Contacto</a>
+        <a href="#portfolio" class="hover:text-primary">Portfolio</a>
+        <a href="#contacto" class="inline-flex items-center gap-1 text-ink border border-ink rounded-full px-4 py-2 self-start hover:border-primary hover:text-primary mt-2">
+          Trabajemos juntos ↗
+        </a>
+      </nav>
+    </div>
+  </header>
+
+
+  <!-- ================================================
+       HERO — foto B&W editorial, headline grande
+  ================================================ -->
+  <section class="relative overflow-hidden">
+
+    <!-- Imagen hero: foto B&W de la directora con equipos de fotografía -->
+    <div class="relative h-[70vh] lg:h-[85vh] w-full">
+      <img
+        src="./assets/Captura de Pantalla 2026-03-03 a la(s) 16.58.16.png"
+        alt="Agencia Rosa — dirección creativa"
+        class="w-full h-full object-cover object-center"
+      />
+      <!-- Overlay gradiente para legibilidad del texto -->
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/10 to-transparent"></div>
+
+      <!-- Texto sobre la imagen, alineado al fondo izquierdo — estilo editorial -->
+      <div class="absolute bottom-10 left-0 right-0 px-6 lg:px-16">
+        <div class="max-w-7xl mx-auto">
+          <p class="section-label font-sans text-xs tracking-widest text-white/70 uppercase mb-4">Branding · Contenido · Diseño web</p>
+          <!-- Cormorant Garamond en tamaño grande — marca editorial del moodboard -->
+          <h1 class="font-display text-5xl lg:text-7xl font-light text-white leading-tight max-w-2xl">
+            Tu marca,<br/>
+            <span class="italic">completa y coherente.</span>
+          </h1>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticker decorativo debajo del hero -->
+    <div class="bg-primary py-3 overflow-hidden">
+      <p class="font-sans text-xs font-light tracking-widest text-white/90 uppercase whitespace-nowrap animate-pulse text-center">
+        Branding &nbsp;·&nbsp; Contenido y fotografía &nbsp;·&nbsp; Diseño y desarrollo web &nbsp;·&nbsp; Packaging &nbsp;·&nbsp; Dirección creativa &nbsp;·&nbsp; Estrategia de marca
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       INTRO — tagline centrado
+  ================================================ -->
+  <section class="py-20 lg:py-28 px-6">
+    <div class="max-w-3xl mx-auto text-center reveal">
+      <!-- Display serif para el párrafo principal — el texto grande y elegante del moodboard -->
+      <p class="font-display text-3xl lg:text-4xl font-light text-ink leading-relaxed">
+        En Agencia Rosa no trabajamos solo un logo bonito —
+        trabajamos una marca completa que <em>inspira y conecta</em> con tu audiencia.
+      </p>
+      <div class="mt-10 flex items-center justify-center gap-4">
+        <a href="#servicios" class="font-sans text-sm font-light text-white bg-primary hover:bg-primary-dark rounded-full px-7 py-3">
+          Ver servicios
+        </a>
+        <a href="#portfolio" class="font-sans text-sm font-light text-ink border border-ink hover:border-primary hover:text-primary rounded-full px-7 py-3">
+          Portfolio
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       SERVICIOS — lista editorial grande
+  ================================================ -->
+  <section id="servicios" class="py-16 lg:py-24 px-6 bg-secondary/30">
+    <div class="max-w-7xl mx-auto">
+
+      <div class="mb-14 reveal">
+        <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-3">Lo que hacemos</p>
+        <h2 class="font-display text-5xl lg:text-6xl font-light text-ink">Servicios</h2>
+      </div>
+
+      <!-- Servicios como lista tipográfica grande — estilo del moodboard (6.png) -->
+      <div class="divide-y divide-ink/10">
+
+        <div class="group py-8 lg:py-10 flex items-start justify-between gap-6 cursor-default reveal">
+          <div class="flex items-start gap-6 lg:gap-10">
+            <span class="font-sans text-xs text-ink-subtle mt-2 shrink-0">01</span>
+            <div>
+              <h3 class="font-display text-4xl lg:text-5xl font-light text-ink group-hover:text-primary transition-colors">Branding</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mt-2 max-w-lg">
+                Identidad visual completa que inspira y conecta con tu audiencia. Nuestra especialidad.
+              </p>
+            </div>
+          </div>
+          <!-- Badge "Nuestra especialidad" — dorado, tal como en el moodboard -->
+          <div class="shrink-0 flex items-center justify-center w-16 h-16 rounded-full bg-gold text-white font-sans text-[10px] font-medium text-center leading-tight border-2 border-gold-dark hidden sm:flex">
+            Nuestra<br/>especialidad
+          </div>
+        </div>
+
+        <div class="group py-8 lg:py-10 flex items-start justify-between gap-6 cursor-default reveal">
+          <div class="flex items-start gap-6 lg:gap-10">
+            <span class="font-sans text-xs text-ink-subtle mt-2 shrink-0">02</span>
+            <div>
+              <h3 class="font-display text-4xl lg:text-5xl font-light text-ink group-hover:text-primary transition-colors">Contenido y fotografía</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mt-2 max-w-lg">
+                Imágenes y piezas que comunican la esencia de tu marca con coherencia visual.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="group py-8 lg:py-10 flex items-start justify-between gap-6 cursor-default reveal">
+          <div class="flex items-start gap-6 lg:gap-10">
+            <span class="font-sans text-xs text-ink-subtle mt-2 shrink-0">03</span>
+            <div>
+              <h3 class="font-display text-4xl lg:text-5xl font-light text-ink group-hover:text-primary transition-colors">Diseño y desarrollo web</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mt-2 max-w-lg">
+                Sitios que convierten. Diseño a medida con la misma dirección creativa de tu marca.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="group py-8 lg:py-10 flex items-start justify-between gap-6 cursor-default reveal">
+          <div class="flex items-start gap-6 lg:gap-10">
+            <span class="font-sans text-xs text-ink-subtle mt-2 shrink-0">04</span>
+            <div>
+              <h3 class="font-display text-4xl lg:text-5xl font-light text-ink group-hover:text-primary transition-colors">Packaging</h3>
+              <p class="font-sans text-sm font-light text-ink-muted mt-2 max-w-lg">
+                Diseñamos el empaque que comunica la historia de tu producto desde el primer vistazo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-12 reveal">
+        <a href="#contacto" class="font-sans text-sm font-light text-ink border border-ink hover:border-primary hover:text-primary rounded-full px-7 py-3 inline-flex items-center gap-2">
+          Hablemos de tu proyecto ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       BRANDING SHOWCASE — imagen de DONOSTI + texto
+  ================================================ -->
+  <section class="py-16 lg:py-24 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+
+        <!-- Imagen: packaging DONOSTI (7.png) -->
+        <div class="reveal order-2 lg:order-1">
+          <img
+            src="./assets/7.png"
+            alt="Branding DONOSTI — Agencia Rosa"
+            class="w-full rounded-2xl object-cover img-bw shadow-card"
+          />
+        </div>
+
+        <!-- Texto -->
+        <div class="reveal order-1 lg:order-2">
+          <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-4">Nuestro trabajo</p>
+          <h2 class="font-display text-4xl lg:text-5xl font-light text-ink leading-snug mb-6">
+            Marcas que se ven,<br/>
+            <em>se sienten y se recuerdan.</em>
+          </h2>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-6">
+            Cada proyecto parte de una dirección creativa sólida. Construimos el sistema visual completo
+            — desde el logo hasta el packaging — para que tu marca sea reconocible en todos los puntos de contacto.
+          </p>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-8">
+            El resultado es una identidad que no solo se ve bien hoy, sino que tiene la estructura
+            para crecer y adaptarse con vos.
+          </p>
+          <a href="#portfolio" class="font-sans text-sm font-light text-white bg-primary hover:bg-primary-dark rounded-full px-7 py-3 inline-block">
+            Ver portfolio
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       PORTFOLIO — collage de proyectos (9.png)
+  ================================================ -->
+  <section id="portfolio" class="py-16 lg:py-24 px-6 bg-surface-dark/40">
+    <div class="max-w-7xl mx-auto">
+
+      <div class="mb-12 flex items-end justify-between reveal">
+        <div>
+          <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-3">Proyectos</p>
+          <h2 class="font-display text-5xl lg:text-6xl font-light text-ink">Portfolio</h2>
+        </div>
+        <a href="#contacto" class="hidden sm:inline-flex font-sans text-sm font-light text-ink border border-ink hover:border-primary hover:text-primary rounded-full px-5 py-2.5 items-center gap-1.5">
+          Trabajemos juntos ↗
+        </a>
+      </div>
+
+      <!-- Imagen collage de proyectos — moodboard (9.png) -->
+      <div class="reveal">
+        <img
+          src="./assets/9.png"
+          alt="Portfolio — proyectos Agencia Rosa"
+          class="w-full rounded-2xl object-cover shadow-card img-bw"
+        />
+      </div>
+
+      <!-- Categorías del portfolio como tags -->
+      <div class="flex flex-wrap gap-3 mt-8 reveal">
+        <span class="font-sans text-xs font-light text-ink border border-ink/20 rounded-full px-4 py-1.5">Branding</span>
+        <span class="font-sans text-xs font-light text-ink border border-ink/20 rounded-full px-4 py-1.5">Packaging</span>
+        <span class="font-sans text-xs font-light text-ink border border-ink/20 rounded-full px-4 py-1.5">Fotografía</span>
+        <span class="font-sans text-xs font-light text-ink border border-ink/20 rounded-full px-4 py-1.5">Diseño web</span>
+        <span class="font-sans text-xs font-light text-ink border border-ink/20 rounded-full px-4 py-1.5">Identidad visual</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       NOSOTRAS — foto de estudio + intro personal
+  ================================================ -->
+  <section id="nosotras" class="py-16 lg:py-24 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+
+        <!-- Texto -->
+        <div class="reveal">
+          <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-4">Quiénes somos</p>
+          <h2 class="font-display text-4xl lg:text-5xl font-light text-ink leading-snug mb-6">
+            Somos la agencia que<br/>
+            <em>no te pide el brief tres veces.</em>
+          </h2>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-4">
+            Entendemos el negocio detrás de la marca. Por eso nuestro proceso empieza con preguntas profundas
+            antes de abrir cualquier archivo de diseño.
+          </p>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-8">
+            Trabajamos con emprendedoras y marcas que quieren construir algo que dure —
+            no solo un look bonito para el lanzamiento.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a href="#contacto" class="font-sans text-sm font-light text-white bg-primary hover:bg-primary-dark rounded-full px-7 py-3 text-center">
+              Trabajemos juntos
+            </a>
+            <a href="#" class="font-sans text-sm font-light text-ink border border-ink hover:border-primary hover:text-primary rounded-full px-7 py-3 text-center">
+              Nuestra historia
+            </a>
+          </div>
+        </div>
+
+        <!-- Imagen: estudio + flores (8.png) -->
+        <div class="reveal">
+          <img
+            src="./assets/8.png"
+            alt="Nosotras — Agencia Rosa"
+            class="w-full rounded-2xl object-cover shadow-card img-bw"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       TIENDA / THE VISION PROCESS — curso destacado
+  ================================================ -->
+  <section id="tienda" class="py-16 lg:py-24 px-6 bg-secondary/30">
+    <div class="max-w-7xl mx-auto">
+
+      <div class="mb-14 reveal">
+        <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-3">Recursos y cursos</p>
+        <h2 class="font-display text-5xl lg:text-6xl font-light text-ink">Tienda</h2>
+      </div>
+
+      <!-- Curso destacado: The Vision Process -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16">
+
+        <!-- Imagen laptop con el curso -->
+        <div class="reveal">
+          <img
+            src="./assets/Untitled2.png"
+            alt="The Vision Process — curso de branding"
+            class="w-full rounded-2xl object-cover shadow-card"
+          />
+        </div>
+
+        <!-- Info del curso -->
+        <div class="reveal">
+          <span class="inline-flex font-sans text-xs font-light text-primary border border-primary rounded-full px-4 py-1 mb-5">
+            Curso online
+          </span>
+          <h3 class="font-display text-4xl lg:text-5xl font-light text-ink leading-snug mb-4">
+            The Vision Process
+          </h3>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-6">
+            Un curso con <strong class="font-medium text-ink">6 clases pregrabadas + 2 plantillas</strong> necesarias
+            para tu servicio de branding. Aprendés a crear una buena dirección creativa y a construir
+            el concepto y estrategia de una marca.
+          </p>
+          <ul class="space-y-2 mb-8">
+            <li class="flex items-center gap-2 font-sans text-sm font-light text-ink-muted">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+              6 clases pregrabadas a tu ritmo
+            </li>
+            <li class="flex items-center gap-2 font-sans text-sm font-light text-ink-muted">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+              2 plantillas de trabajo listas para usar
+            </li>
+            <li class="flex items-center gap-2 font-sans text-sm font-light text-ink-muted">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
+              Dirección creativa y estrategia de marca
+            </li>
+          </ul>
+          <a href="#" class="font-sans text-sm font-light text-white bg-primary hover:bg-primary-dark rounded-full px-8 py-3 inline-block">
+            Me quiero inscribir
+          </a>
+        </div>
+      </div>
+
+      <!-- Otros recursos — 3 tarjetas (Untitled4.png) -->
+      <p class="font-sans text-xs font-medium tracking-widest text-ink-subtle uppercase mb-6 reveal">Más recursos</p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <!-- Card 1 -->
+        <div class="group rounded-2xl overflow-hidden shadow-soft bg-white reveal">
+          <div class="relative h-48 overflow-hidden">
+            <img
+              src="./assets/Untitled4.png"
+              alt="Cómo vivir de tu trabajo siendo freelancer creativo"
+              class="w-full h-full object-cover object-left scale-110 group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-ink/20 group-hover:bg-ink/10 transition-colors"></div>
+          </div>
+          <div class="p-6">
+            <h4 class="font-display text-xl font-light text-ink mb-2 leading-snug">Cómo vivir de tu trabajo siendo freelancer creativo</h4>
+            <a href="#" class="inline-flex items-center gap-1.5 font-sans text-xs font-light text-primary hover:text-primary-dark mt-3">
+              Ver recurso ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="group rounded-2xl overflow-hidden shadow-soft bg-white reveal">
+          <div class="relative h-48 overflow-hidden bg-surface-dark flex items-center justify-center">
+            <img
+              src="./assets/Untitled4.png"
+              alt="Marca personal exitosa"
+              class="w-full h-full object-cover object-center scale-110 group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-ink/20 group-hover:bg-ink/10 transition-colors"></div>
+          </div>
+          <div class="p-6">
+            <h4 class="font-display text-xl font-light text-ink mb-2 leading-snug">Marca personal exitosa</h4>
+            <a href="#" class="inline-flex items-center gap-1.5 font-sans text-xs font-light text-primary hover:text-primary-dark mt-3">
+              Ver recurso ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="group rounded-2xl overflow-hidden shadow-soft bg-white reveal">
+          <div class="relative h-48 overflow-hidden">
+            <img
+              src="./assets/Untitled4.png"
+              alt="Generá ingresos pasivos vendiendo productos digitales"
+              class="w-full h-full object-cover object-right scale-110 group-hover:scale-105 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-ink/20 group-hover:bg-ink/10 transition-colors"></div>
+          </div>
+          <div class="p-6">
+            <h4 class="font-display text-xl font-light text-ink mb-2 leading-snug">Generá ingresos pasivos vendiendo productos digitales</h4>
+            <a href="#" class="inline-flex items-center gap-1.5 font-sans text-xs font-light text-primary hover:text-primary-dark mt-3">
+              Ver recurso ↗
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       THE BRIEF — newsletter (Untitled.png)
+  ================================================ -->
+  <section class="py-16 lg:py-24 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+
+        <!-- Imagen: The Brief podcast/newsletter card -->
+        <div class="reveal">
+          <img
+            src="./assets/Untitled.png"
+            alt="The Brief — newsletter de Agencia Rosa"
+            class="w-full max-w-sm mx-auto rounded-2xl shadow-card"
+          />
+        </div>
+
+        <!-- Formulario de suscripción -->
+        <div class="reveal">
+          <p class="section-label font-sans text-xs tracking-widest text-ink-subtle uppercase mb-4">Newsletter</p>
+          <h2 class="font-display text-4xl lg:text-5xl font-light text-ink leading-snug mb-4">
+            The Brief
+          </h2>
+          <p class="font-sans text-sm font-light text-ink-muted leading-relaxed mb-8">
+            Ideas sobre branding, creatividad y negocio directamente en tu bandeja de entrada.
+            Sin spam, solo lo que realmente sirve.
+          </p>
+          <form class="flex flex-col sm:flex-row gap-3" onsubmit="return false;">
+            <input
+              type="email"
+              placeholder="tu@email.com"
+              class="flex-1 font-sans text-sm font-light text-ink placeholder-ink-subtle bg-surface border border-surface-dark rounded-full px-5 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+            <button
+              type="submit"
+              class="font-sans text-sm font-light text-white bg-primary hover:bg-primary-dark rounded-full px-7 py-3 shrink-0"
+            >
+              Suscribirme
+            </button>
+          </form>
+          <p class="font-sans text-xs text-ink-subtle mt-3">Sin spam. Podés darte de baja cuando quieras.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       CTA FINAL — "Trabajemos juntos"
+  ================================================ -->
+  <section id="contacto" class="py-24 lg:py-32 px-6 bg-ink text-white">
+    <div class="max-w-3xl mx-auto text-center reveal">
+      <p class="font-sans text-xs tracking-widest text-white/40 uppercase mb-6">¿Listo para empezar?</p>
+      <h2 class="font-display text-5xl lg:text-7xl font-light leading-tight mb-8">
+        Trabajemos<br/>
+        <span class="italic">juntos.</span>
+      </h2>
+      <p class="font-sans text-sm font-light text-white/60 leading-relaxed mb-10 max-w-md mx-auto">
+        Contanos sobre tu proyecto. Evaluamos si somos el equipo indicado para llevar
+        tu marca al siguiente nivel.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="mailto:hola@agenciarosa.com"
+          class="font-sans text-sm font-light text-ink bg-white hover:bg-surface rounded-full px-8 py-3.5 inline-block"
+        >
+          hola@agenciarosa.com
+        </a>
+        <a
+          href="#"
+          class="font-sans text-sm font-light text-white border border-white/30 hover:border-white rounded-full px-8 py-3.5 inline-block"
+        >
+          Instagram ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ================================================
+       FOOTER
+  ================================================ -->
+  <footer class="bg-ink border-t border-white/10 px-6 py-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+        <!-- Marca -->
+        <div class="lg:col-span-2">
+          <p class="font-display text-2xl font-light text-white mb-3">Agencia Rosa</p>
+          <p class="font-sans text-xs font-light text-white/40 leading-relaxed max-w-xs">
+            Branding, contenido y diseño web para marcas que quieren construir algo que dure.
+          </p>
+        </div>
+
+        <!-- Servicios -->
+        <div>
+          <p class="font-sans text-xs font-medium tracking-widest text-white/30 uppercase mb-4">Servicios</p>
+          <ul class="space-y-2 font-sans text-sm font-light text-white/50">
+            <li><a href="#servicios" class="hover:text-white transition-colors">Branding</a></li>
+            <li><a href="#servicios" class="hover:text-white transition-colors">Contenido y fotografía</a></li>
+            <li><a href="#servicios" class="hover:text-white transition-colors">Diseño web</a></li>
+            <li><a href="#servicios" class="hover:text-white transition-colors">Packaging</a></li>
+          </ul>
+        </div>
+
+        <!-- Links -->
+        <div>
+          <p class="font-sans text-xs font-medium tracking-widest text-white/30 uppercase mb-4">Seguinos</p>
+          <ul class="space-y-2 font-sans text-sm font-light text-white/50">
+            <li><a href="#" class="hover:text-white transition-colors">Instagram</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Facebook</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">TikTok</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom bar -->
+      <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <p class="font-sans text-xs text-white/25">© Agencia Rosa · 2026</p>
+        <div class="flex gap-6 font-sans text-xs text-white/25">
+          <a href="#" class="hover:text-white/60 transition-colors">Términos y condiciones</a>
+          <a href="#" class="hover:text-white/60 transition-colors">Política de privacidad</a>
+          <a href="#" class="hover:text-white/60 transition-colors">Política de cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ================================================
+       JS — Mobile menu + reveal animation
+  ================================================ -->
+  <script>
+    // --- Mobile menu toggle ---
+    const menuToggle  = document.getElementById('menu-toggle');
+    const mobileMenu  = document.getElementById('mobile-menu');
+
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Cerrar mobile menu al hacer click en un link interno
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
+
+    // --- Scroll reveal con IntersectionObserver ---
+    // Observa todos los elementos con clase .reveal y los anima al entrar en viewport
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // Deja de observar una vez que fue revelado (no se necesita re-animar)
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.12,        // Se activa cuando el 12% del elemento es visible
+        rootMargin: '0px 0px -40px 0px', // Pequeño offset para que no se active demasiado pronto
+      }
+    );
+
+    // Aplica el observer a todos los elementos reveal del documento
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
